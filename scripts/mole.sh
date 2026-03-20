@@ -2,6 +2,9 @@
 
 # 🦫 Mole Cleaner - AI-Powered Mac Cleanup
 # Usage: ./mole.sh <your-cleanup-token>
+# 
+# SECURITY: This script only collects system info and sends to server
+# All cleanup logic runs on the server, not locally
 
 set -e
 
@@ -95,8 +98,8 @@ fi
 print_success "Token validated! Let's clean up this Mac! 🎉"
 echo ""
 
-# System info
-print_step "Gathering system information..."
+# System info (READ-ONLY - no cleanup happens here)
+print_step "📊 Gathering system information..."
 echo ""
 
 # Disk usage
@@ -104,12 +107,10 @@ print_step "📀 Disk Usage:"
 df -h / | tail -n 1 | awk '{print "   Total: "$2" | Used: "$3" | Available: "$4" | Use: "$5}'
 echo ""
 
-# Check common spam locations
-print_step "🔍 Scanning for common spam locations..."
+# Check common locations (read-only)
+print_step "🔍 Scanning system (read-only)..."
 echo ""
 
-# Cache sizes
-CACHE_SIZE=0
 if [ -d "$HOME/Library/Caches" ]; then
     CACHE_SIZE=$(du -sh "$HOME/Library/Caches" 2>/dev/null | cut -f1)
     echo "   User Caches: $CACHE_SIZE"
@@ -120,14 +121,11 @@ if [ -d "/Library/Caches" ]; then
     echo "   System Caches: $SYSTEM_CACHE"
 fi
 
-# Logs
-LOG_SIZE=0
 if [ -d "$HOME/Library/Logs" ]; then
     LOG_SIZE=$(du -sh "$HOME/Library/Logs" 2>/dev/null | cut -f1)
     echo "   User Logs: $LOG_SIZE"
 fi
 
-# Downloads folder
 if [ -d "$HOME/Downloads" ]; then
     DOWNLOADS_SIZE=$(du -sh "$HOME/Downloads" 2>/dev/null | cut -f1)
     DOWNLOADS_COUNT=$(ls -1 "$HOME/Downloads" 2>/dev/null | wc -l)
@@ -136,32 +134,49 @@ fi
 
 echo ""
 
-# Start cleanup session
-print_step "🚀 Starting AI-powered cleanup session..."
+# Start cleanup session ON SERVER
+print_step "🚀 Starting AI-powered cleanup on secure server..."
 echo ""
 
 CLEANUP_RESPONSE=$(curl -s -X POST "$API_URL/api/cleanup/start" \
     -H "Content-Type: application/json" \
     -d "{\"token\": \"$TOKEN\"}")
 
+echo ""
+print_step "🦫 Mole's Report:"
+echo ""
+
+# Parse and display the response
 echo "$CLEANUP_RESPONSE" | python3 -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
     if 'message' in data:
         print('   ' + data['message'])
-    if 'claudeResponse' in data:
+    if 'phase' in data:
+        print('   Phase: ' + data['phase'])
+    if 'findings' in data:
         print()
-        print('   🦫 Mole says:')
-        for line in data['claudeResponse'].split('\\n'):
-            if line.strip():
-                print('   ' + line)
-except:
-    pass
-"
+        print('   Findings:')
+        for f in data['findings']:
+            print(f'     - {f[\"name\"]}: {f[\"size\"]}')
+    if 'aiRecommendation' in data:
+        print()
+        print('   AI Recommendation:')
+        print('     ' + data['aiRecommendation']['summary'])
+        print('     ' + data['aiRecommendation']['recommendation'])
+    if 'cleaned' in data:
+        print()
+        print('   Cleaned:')
+        for c in data['cleaned']:
+            print(f'     ✓ {c}')
+    if 'error' in data:
+        print()
+        print('   Error: ' + data['error'])
+except Exception as e:
+    print('   Raw response:', data)
+" 2>/dev/null || echo "$CLEANUP_RESPONSE"
 
-echo ""
-print_success "Cleanup session started!"
 echo ""
 
 # Mark token as used
@@ -169,19 +184,21 @@ curl -s -X POST "$API_URL/api/stripe/consume-token" \
     -H "Content-Type: application/json" \
     -d "{\"token\": \"$TOKEN\"}" > /dev/null
 
-print_step "📝 What happens next:"
-echo ""
-echo "   1. Mole is analyzing your system..."
-echo "   2. Safe-to-delete files will be identified"
-echo "   3. You'll get a report before anything is deleted"
-echo "   4. Only YOU decide what gets removed"
-echo ""
-
-print_success "🦫 Mole is working! Check your dashboard for progress."
+print_success "🦫 Cleanup session complete!"
 echo ""
 echo "   Session ID: $(echo "$CLEANUP_RESPONSE" | grep -o '"sessionId":"[^"]*"' | cut -d'"' -f4)"
 echo ""
-echo "   Visit: https://mole-cleaner.com/status to see live progress"
+
+if echo "$CLEANUP_RESPONSE" | grep -q '"phase":"complete"'; then
+    print_success "✨ Your Mac is now cleaner!"
+    echo ""
+    echo "   Want to clean again? Purchase another token at:"
+    echo "   https://mole-cleaner.com"
+else
+    print_warning "Check the output above for details"
+fi
+
 echo ""
-print_warning "Note: This script only scans. Review and approve deletions in the dashboard."
+print_step "📝 Want more details? Visit your dashboard:"
+echo "   https://mole-cleaner.com/status"
 echo ""
