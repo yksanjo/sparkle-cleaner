@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦫 Mole Cleaner - AI-Powered Mac Cleanup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 80px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .price {
+            font-size: 48px;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .features li {
+            list-style: none;
+            padding: 8px 0;
+            color: #555;
+        }
+
+        .features li:before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .terminal {
+            background: #1a1a2e;
+            color: #00ff9d;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            text-align: left;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🦫</div>
+        <h1>Mole Cleaner</h1>
+        <p class="tagline">AI-Powered Mac Cleanup Service</p>
+        
+        <div class="price">$3</div>
+        
+        <ul class="features">
+            <li>AI-powered cleanup using Claude</li>
+            <li>Safely removes caches & spam files</li>
+            <li>No app installation required</li>
+            <li>One-time payment, no subscription</li>
+            <li>Works on all macOS versions</li>
+        </ul>
+
+        <button class="btn" id="checkoutBtn" onclick="startCheckout()">
+            🚀 Get Clean Token
+        </button>
+
+        <div class="terminal" id="terminal">
+            $ ./mole.sh your_token_here<br>
+            🦫 Mole is waking up...<br>
+            ✓ Token validated!<br>
+            🔍 Scanning for spam...<br>
+            🧹 Cleaning complete!<br>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <strong>🎉 Payment Successful!</strong><br>
+            Your cleanup token has been sent to your email.<br>
+            Check your inbox and run the mole.sh script!
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : window.location.origin;
+
+        async function startCheckout() {
+            const btn = document.getElementById('checkoutBtn');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_URL}/api/stripe/create-checkout-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                const data = await response.json();
+
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error('Failed to create checkout session');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.textContent = '❌ ' + error.message;
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = '🚀 Get Clean Token';
+            }
+        }
+
+        // Check for success/cancel from Stripe redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+
+        if (sessionId) {
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('checkoutBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
