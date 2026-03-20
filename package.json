@@ -1,7 +1,7 @@
 {
-  "name": "mole-cleaner",
+  "name": "sparkle-cleaner",
   "version": "1.0.0",
-  "description": "🦫 AI-powered Mac cleanup service - terminal-based spam cleaner",
+  "description": "✨ AI-powered Mac cleanup service by Yoshi Kondo - terminal-based spam cleaner",
   "main": "backend/api/server.js",
   "type": "module",
   "scripts": {
@@ -16,9 +16,11 @@
     "spam",
     "ai",
     "claude",
-    "terminal"
+    "terminal",
+    "sparkle",
+    "yoshi-kondo"
   ],
-  "author": "",
+  "author": "Yoshi Kondo",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",

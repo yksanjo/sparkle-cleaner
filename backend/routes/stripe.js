@@ -16,7 +16,7 @@ function loadTokens() {
       const data = readFileSync(TOKENS_FILE, 'utf8');
       const tokens = JSON.parse(data);
       validTokens = new Map(Object.entries(tokens));
-      console.log(`🦫 Loaded ${validTokens.size} tokens from storage`);
+      console.log(`✨ Loaded ${validTokens.size} tokens from storage`);
     }
   } catch (error) {
     console.error('Error loading tokens:', error.message);
@@ -48,8 +48,8 @@ stripeRouter.post('/create-checkout-session', async (req, res) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Mole Cleaner - One-time Cleanup',
-              description: 'AI-powered Mac spam cleanup service',
+              name: 'Sparkle Cleaner - One-time Cleanup',
+              description: 'AI-powered Mac spam cleanup service by Yoshi Kondo',
             },
             unit_amount: 300, // $3.00
           },
@@ -103,7 +103,7 @@ stripeRouter.post('/webhook', async (req, res) => {
 
       // Generate a one-time cleanup token
       const tokenId = session.metadata.token_id || uuidv4();
-      const cleanupToken = `mole_${tokenId}`;
+      const cleanupToken = `sparkle_${tokenId}`;
 
       // Store token with expiration (24 hours)
       validTokens.set(cleanupToken, {
@@ -117,7 +117,7 @@ stripeRouter.post('/webhook', async (req, res) => {
       });
 
       saveTokens();
-      console.log(`🦫 Token generated: ${cleanupToken} for session ${session.id}`);
+      console.log(`✨ Token generated: ${cleanupToken} for session ${session.id}`);
 
       // TODO: Send token via email (use SendGrid, Postmark, etc.)
       // For now, it's logged - you'll need to set up email delivery

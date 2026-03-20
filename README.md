@@ -1,11 +1,11 @@
-# 🦫 Mole Cleaner
+# ✨ Sparkle Cleaner
 
-**AI-Powered Mac Cleanup Service** - $3 terminal-based spam cleaner for macOS
+**AI-Powered Mac Cleanup Service by Yoshi Kondo** - $3 terminal-based spam cleaner for macOS
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Price](https://img.shields.io/badge/price-$3-green.svg)
 
-> 🦫 *"Digging through your caches so you don't have to!"*
+> ✨ *"Making your Mac sparkle like new!"*
 
 A friendly, AI-powered cleanup tool that safely identifies and removes spam, caches, and unnecessary files from your Mac. Built for the terminal, powered by Claude AI.
 
@@ -19,6 +19,7 @@ A friendly, AI-powered cleanup tool that safely identifies and removes spam, cac
 - 📟 **Terminal Native**: No app installation, just run a script
 - 🎯 **Targeted Cleanup**: Focuses on caches, logs, and temporary files
 - 📊 **Transparent Reports**: See exactly what will be deleted before approval
+- 👨‍💻 **By Yoshi Kondo**: Built with care for the Mac community
 
 ---
 
@@ -26,24 +27,24 @@ A friendly, AI-powered cleanup tool that safely identifies and removes spam, cac
 
 ### 1. Purchase Your Cleanup Token
 
-Visit [mole-cleaner.com](https://mole-cleaner.com) and pay $3 via Stripe.
+Visit [sparkle-cleaner.com](https://sparkle-cleaner.com) and pay $3 via Stripe.
 
 ### 2. Download & Run
 
 ```bash
 # Download the script
-curl -O https://raw.githubusercontent.com/yourusername/mole-cleaner/main/scripts/mole.sh
+curl -O https://raw.githubusercontent.com/yksanjo/sparkle-cleaner/main/scripts/sparkle.sh
 
 # Make it executable
-chmod +x mole.sh
+chmod +x sparkle.sh
 
 # Run with your token
-./mole.sh mole_your_token_here
+./sparkle.sh sparkle_your_token_here
 ```
 
-### 3. Watch the Magic 🪄
+### 3. Watch the Magic ✨
 
-Mole will:
+Sparkle will:
 1. Validate your token
 2. Scan your system for spam
 3. Report what can be safely cleaned
@@ -53,7 +54,7 @@ Mole will:
 
 ## 🛠️ Self-Host Setup (For Developers)
 
-Want to run your own Mole Cleaner service? Here's how!
+Want to run your own Sparkle Cleaner service? Here's how!
 
 ### Prerequisites
 
@@ -66,8 +67,8 @@ Want to run your own Mole Cleaner service? Here's how!
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/mole-cleaner.git
-cd mole-cleaner
+git clone https://github.com/yksanjo/sparkle-cleaner.git
+cd sparkle-cleaner
 
 # Install dependencies
 npm install
@@ -93,7 +94,7 @@ FRONTEND_URL=http://localhost:3000
 API_BASE_URL=http://localhost:3000
 
 # Optional: For the script
-MOLE_API_URL=http://localhost:3000
+SPARKLE_API_URL=http://localhost:3000
 ```
 
 ### Run the Server
@@ -117,14 +118,14 @@ npm start
 
 ```bash
 cd scripts
-./mole.sh mole_test_token
+./sparkle.sh sparkle_test_token
 ```
 
 ---
 
 ## 📁 What Gets Cleaned
 
-Mole safely targets:
+Sparkle safely targets:
 
 | Location | Description | Safe to Delete |
 |----------|-------------|----------------|
@@ -149,14 +150,15 @@ Mole safely targets:
 
 ## 🎨 Branding & Customization
 
-Mole is designed with a friendly, approachable personality:
+Sparkle is designed with a clean, professional personality:
 
-- **Mascot**: Mole the gopher (🦫)
+- **Mascot**: Sparkles (✨)
 - **Tone**: Friendly, helpful, transparent
-- **Colors**: Purple/Cyan theme (terminal colors)
+- **Colors**: Purple/Blue gradient theme
+- **Author**: Yoshi Kondo
 
 Feel free to customize:
-- Logo in `scripts/mole.sh`
+- Logo in `scripts/sparkle.sh`
 - System prompt in `backend/api/claude.js`
 - Colors and messages throughout
 
@@ -177,7 +179,7 @@ Feel free to customize:
        │                              └─────────────┘
        ▼
 ┌─────────────┐
-│  mole.sh    │───▶ Scans & Cleans
+│ sparkle.sh  │───▶ Scans & Cleans
 └─────────────┘
 ```
 
@@ -190,6 +192,7 @@ Feel free to customize:
 - No persistent storage of user data
 - All actions logged for liability
 - User approval required before deletions
+- Payment verification via Stripe webhooks
 
 ---
 
@@ -214,10 +217,10 @@ MIT License - feel free to fork and customize!
 ## 🙋 FAQ
 
 **Q: Is this safe?**  
-A: Yes! Mole only targets cache and temporary files. It never deletes personal files without explicit approval.
+A: Yes! Sparkle only targets cache and temporary files. It never deletes personal files without explicit approval.
 
 **Q: What if something goes wrong?**  
-A: All actions are logged. Contact support at support@mole-cleaner.com
+A: All actions are logged. Contact support at support@sparkle-cleaner.com
 
 **Q: Can I use this on multiple Macs?**  
 A: Each token is single-use. Purchase a new token for each Mac.
@@ -225,6 +228,9 @@ A: Each token is single-use. Purchase a new token for each Mac.
 **Q: How long does cleanup take?**  
 A: Usually 5-10 minutes depending on your system.
 
+**Q: Who made this?**  
+A: Yoshi Kondo built Sparkle to help Mac users keep their systems clean!
+
 ---
 
-Made with 💜 by the Mole Team 🦫
+Made with ✨ by [Yoshi Kondo](https://github.com/yksanjo)

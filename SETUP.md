@@ -1,11 +1,13 @@
-# 🦫 Mole Cleaner - Setup Guide
+# ✨ Sparkle Cleaner - Setup Guide
+
+by Yoshi Kondo
 
 ## Quick Start (5 minutes)
 
 ### 1. Install Dependencies
 
 ```bash
-cd mole-cleaner
+cd sparkle-cleaner
 npm install
 ```
 
@@ -14,19 +16,19 @@ npm install
 #### Stripe
 1. Go to [Stripe Dashboard](https://dashboard.stripe.com/)
 2. Navigate to **Developers → API Keys**
-3. Copy your **Secret key** (`sk_test_...`)
+3. Copy your **Secret key** (starts with `sk_test_...`)
 4. For webhooks:
    - Go to **Developers → Webhooks**
-   - Click **Add endpoint**
+   - Click **"Add endpoint"**
    - URL: `http://localhost:3000/api/stripe/webhook`
    - Events: `checkout.session.completed`
-   - Copy the **Signing secret** (`whsec_...`)
+   - Copy the **Signing secret** (starts with `whsec_...`)
 
 #### Anthropic (Claude API)
 1. Go to [Anthropic Console](https://console.anthropic.com/)
 2. Navigate to **Settings → API Keys**
 3. Create a new key
-4. Copy your **API key** (`sk-ant-...`)
+4. Copy your **API key** (starts with `sk-ant-...`)
 
 ### 3. Configure Environment
 
@@ -43,7 +45,7 @@ ANTHROPIC_API_KEY=sk-ant-api03_your_key_here
 PORT=3000
 FRONTEND_URL=http://localhost:3000
 API_BASE_URL=http://localhost:3000
-MOLE_API_URL=http://localhost:3000
+SPARKLE_API_URL=http://localhost:3000
 ```
 
 ### 4. Start the Server
@@ -54,7 +56,7 @@ npm run dev
 
 You should see:
 ```
-🦫 Mole Cleaner API running on port 3000
+✨ Sparkle Cleaner API running on port 3000
    Frontend: http://localhost:3000
    API: http://localhost:3000/api
 ```
@@ -67,11 +69,11 @@ You should see:
 4. Complete checkout
 5. Token will be generated (check server logs)
 
-### 6. Test the Mole Script
+### 6. Test the Sparkle Script
 
 ```bash
 cd scripts
-./mole.sh mole_your_test_token
+./sparkle.sh sparkle_your_test_token
 ```
 
 ---
@@ -81,9 +83,9 @@ cd scripts
 ### Environment Variables for Production
 
 ```bash
-FRONTEND_URL=https://mole-cleaner.com
-API_BASE_URL=https://api.mole-cleaner.com
-MOLE_API_URL=https://api.mole-cleaner.com
+FRONTEND_URL=https://sparkle-cleaner.com
+API_BASE_URL=https://api.sparkle-cleaner.com
+SPARKLE_API_URL=https://api.sparkle-cleaner.com
 ```
 
 ### Deploy Options
@@ -111,13 +113,13 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Clone repo
-git clone https://github.com/yourusername/mole-cleaner.git
-cd mole-cleaner
+git clone https://github.com/yksanjo/sparkle-cleaner.git
+cd sparkle-cleaner
 npm install --production
 
 # PM2 for process management
 npm install -g pm2
-pm2 start npm --name "mole" -- start
+pm2 start npm --name "sparkle" -- start
 pm2 startup
 pm2 save
 
@@ -139,8 +141,8 @@ CMD ["npm", "start"]
 ```
 
 ```bash
-docker build -t mole-cleaner .
-docker run -p 3000:3000 --env-file .env mole-cleaner
+docker build -t sparkle-cleaner .
+docker run -p 3000:3000 --env-file .env sparkle-cleaner
 ```
 
 ---
@@ -175,7 +177,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 ## Troubleshooting
 
 ### "Invalid token" error
-- Check if token format is `mole_xxxxx`
+- Check if token format is `sparkle_xxxxx`
 - Verify token hasn't expired (24hr limit)
 - Check server logs for token generation
 
@@ -191,7 +193,7 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 ### Script permission denied
 ```bash
-chmod +x scripts/mole.sh
+chmod +x scripts/sparkle.sh
 ```
 
 ---
@@ -207,4 +209,4 @@ chmod +x scripts/mole.sh
 
 ---
 
-Need help? Open an issue on GitHub! 🦫
+Need help? Open an issue on GitHub! ✨

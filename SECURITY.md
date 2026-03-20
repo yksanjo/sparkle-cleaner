@@ -1,6 +1,8 @@
-# Security Best Practices for Mole Cleaner
+# 🔒 Security Best Practices for Sparkle Cleaner
 
-## 🔒 Protecting Your Keys
+by Yoshi Kondo
+
+## 🔐 Protecting Your Keys
 
 ### Never Commit Keys
 - `.env` is already in `.gitignore` ✅
@@ -17,8 +19,9 @@
 | Secret (Live) | `sk_live_` | Backend API | ❌ NO |
 | Webhook Secret | `whsec_` | Verify webhooks | ❌ NO |
 
-### What You Shared
-You shared `pk_live_...` - this is your **publishable key** which is safe to use in frontend code, but:
+## What You Shared
+
+If you shared `pk_live_...` - this is your **publishable key** which is safe to use in frontend code, but:
 
 1. **Use test keys for development** (`sk_test_...`)
 2. **Only use live keys when deploying to production**
@@ -32,7 +35,7 @@ Copy the key starting with `sk_test_...`
 
 ### 2. Create Your .env File
 ```bash
-cd mole-cleaner
+cd sparkle-cleaner
 cat > .env << EOF
 STRIPE_SECRET_KEY=sk_test_YOUR_TEST_SECRET_KEY
 STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET
@@ -40,7 +43,7 @@ ANTHROPIC_API_KEY=sk-ant-api03_YOUR_KEY
 PORT=3000
 FRONTEND_URL=http://localhost:3000
 API_BASE_URL=http://localhost:3000
-MOLE_API_URL=http://localhost:3000
+SPARKLE_API_URL=http://localhost:3000
 EOF
 ```
 
@@ -73,4 +76,4 @@ When ready for live payments:
 
 ---
 
-Stay safe! 🦫🔐
+Stay safe! ✨🔐

@@ -4,8 +4,8 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// System prompt for the Mole - defines what to clean
-const MOLE_SYSTEM_PROMPT = `You are Mole, a friendly AI-powered Mac cleanup specialist. 
+// System prompt for Sparkle - defines what to clean
+const SPARKLE_SYSTEM_PROMPT = `You are Sparkle, a friendly AI-powered Mac cleanup specialist created by Yoshi Kondo.
 Your job is to safely identify and remove spam, cache, and unnecessary files from Mac computers.
 
 GUIDELINES:
@@ -44,7 +44,7 @@ export async function cleanupMac(token) {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
-      system: MOLE_SYSTEM_PROMPT,
+      system: SPARKLE_SYSTEM_PROMPT,
       messages: [
         {
           role: 'user',
@@ -66,7 +66,7 @@ Start with a scan and report what you find.`,
       sessionId,
       status: 'started',
       claudeResponse: response.content[0].text,
-      message: '🦫 Mole is starting the cleanup process...',
+      message: '✨ Sparkle is starting the cleanup process...',
     };
   } catch (error) {
     console.error('Claude API error:', error);

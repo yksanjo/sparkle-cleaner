@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 🦫 Mole Cleaner - AI-Powered Mac Cleanup
-# Usage: ./mole.sh <your-cleanup-token>
+# ✨ Sparkle Cleaner - AI-Powered Mac Cleanup by Yoshi Kondo
+# Usage: ./sparkle.sh <your-cleanup-token>
 # 
 # SECURITY: This script only collects system info and sends to server
 # All cleanup logic runs on the server, not locally
@@ -18,18 +18,18 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # API Configuration
-API_URL="${MOLE_API_URL:-http://localhost:3000}"
+API_URL="${SPARKLE_API_URL:-http://localhost:3000}"
 
 # Logo
 print_logo() {
     echo ""
     echo -e "${PURPLE}"
-    echo "  __  __                      "
-    echo " |  \\/  | ___  ___ ___  __ _  "
-    echo " | |\\/| |/ _ \\/ __/ __|/ _\` | "
-    echo " | |  | |  __/\\__ \\__ \\ (_| | "
-    echo " |_|  |_|\\___||___/___/\\__,_| "
-    echo "          🦫 AI Cleaner       "
+    echo "  ____              _       _   _                 "
+    echo " / ___| _   _ _ __ | | __ _| |_(_) ___  _ __  ___ "
+    echo " \___ \| | | | '_ \| |/ _\` | __| |/ _ \| '_ \/ __|"
+    echo "  ___) | |_| | |_) | | (_| | |_| | (_) | | | \__ \\"
+    echo " |____/ \__, | .__/|_|\__,_|\__|_|\___/|_| |_|___/"
+    echo "        |___/|_|    ✨ AI Cleaner by Yoshi Kondo  "
     echo -e "${NC}"
     echo ""
 }
@@ -59,22 +59,22 @@ if [ -z "$1" ]; then
     print_logo
     print_error "Missing cleanup token!"
     echo ""
-    echo "Usage: ./mole.sh <your-cleanup-token>"
+    echo "Usage: ./sparkle.sh <your-cleanup-token>"
     echo ""
-    echo "Get your token after payment at: https://mole-cleaner.com"
+    echo "Get your token after payment at: https://sparkle-cleaner.com"
     exit 1
 fi
 
 TOKEN=$1
 
 print_logo
-print_step "🦫 Mole is waking up..."
+print_step "✨ Sparkle is waking up..."
 echo ""
 
 # Check internet connection
 print_step "Checking internet connection..."
 if ! ping -c 1 8.8.8.8 &> /dev/null; then
-    print_error "No internet connection. Mole needs internet to verify your token."
+    print_error "No internet connection. Sparkle needs internet to verify your token."
     exit 1
 fi
 print_success "Connected!"
@@ -143,7 +143,7 @@ CLEANUP_RESPONSE=$(curl -s -X POST "$API_URL/api/cleanup/start" \
     -d "{\"token\": \"$TOKEN\"}")
 
 echo ""
-print_step "🦫 Mole's Report:"
+print_step "✨ Sparkle's Report:"
 echo ""
 
 # Parse and display the response
@@ -184,21 +184,21 @@ curl -s -X POST "$API_URL/api/stripe/consume-token" \
     -H "Content-Type: application/json" \
     -d "{\"token\": \"$TOKEN\"}" > /dev/null
 
-print_success "🦫 Cleanup session complete!"
+print_success "✨ Sparkle cleanup session complete!"
 echo ""
 echo "   Session ID: $(echo "$CLEANUP_RESPONSE" | grep -o '"sessionId":"[^"]*"' | cut -d'"' -f4)"
 echo ""
 
 if echo "$CLEANUP_RESPONSE" | grep -q '"phase":"complete"'; then
-    print_success "✨ Your Mac is now cleaner!"
+    print_success "🎉 Your Mac is now sparkling clean!"
     echo ""
     echo "   Want to clean again? Purchase another token at:"
-    echo "   https://mole-cleaner.com"
+    echo "   https://sparkle-cleaner.com"
 else
     print_warning "Check the output above for details"
 fi
 
 echo ""
 print_step "📝 Want more details? Visit your dashboard:"
-echo "   https://mole-cleaner.com/status"
+echo "   https://sparkle-cleaner.com/status"
 echo ""

@@ -1,4 +1,6 @@
-# 🦫 Mole Cleaner - How Payment & Security Works
+# ✨ Sparkle Cleaner - How Payment & Security Works
+
+by Yoshi Kondo
 
 ## Payment Flow (Secure)
 
@@ -30,14 +32,14 @@
 // ✅ GOOD: Token created ONLY after Stripe webhook confirms payment
 case 'checkout.session.completed':
   if (session.payment_status !== 'paid') break; // Security check
-  const token = `mole_${uuidv4()}`;
+  const token = `sparkle_${uuidv4()}`;
   validTokens.set(token, { paymentStatus: 'paid', ... });
 ```
 
 ```javascript
 // ❌ BAD: Never generate token before payment
 app.post('/get-token', (req, res) => {
-  res.json({ token: 'mole_xxx' }); // WRONG! No payment check!
+  res.json({ token: 'sparkle_xxx' }); // WRONG! No payment check!
 });
 ```
 
@@ -55,7 +57,7 @@ app.post('/get-token', (req, res) => {
 
 ```bash
 # ✅ GOOD: Script only collects info, server does the work
-# mole.sh - Read-only system scan
+# sparkle.sh - Read-only system scan
 curl server/api/cleanup/start  # Server executes cleanup
 
 # ❌ BAD: Don't put cleanup logic in user's hands
@@ -79,11 +81,11 @@ curl server/api/cleanup/start  # Server executes cleanup
 | Claude API calls | Your server | ❌ No |
 | AI prompts | Your server | ❌ No |
 | Token validation | Your server | ❌ No |
-| mole.sh script | User's machine | ✅ Yes (but read-only) |
+| sparkle.sh script | User's machine | ✅ Yes (but read-only) |
 
 ## What Users CAN See
 
-- `mole.sh` script (but it's read-only, no cleanup logic)
+- `sparkle.sh` script (but it's read-only, no cleanup logic)
 - Their own system info (they already have access)
 - Cleanup results (output from your server)
 
@@ -91,7 +93,7 @@ curl server/api/cleanup/start  # Server executes cleanup
 
 ### Attack 1: Fake Token
 ```bash
-# User tries: ./mole.sh mole_fake_token
+# User tries: ./sparkle.sh sparkle_fake_token
 # Server validates against database → Rejected ❌
 ```
 
@@ -109,7 +111,7 @@ curl server/api/cleanup/start  # Server executes cleanup
 
 ### Attack 4: Script Modification
 ```bash
-# User modifies mole.sh to skip validation
+# User modifies sparkle.sh to skip validation
 # Server still validates token on every request → Still protected ✅
 ```
 
@@ -142,7 +144,7 @@ app.use('/api', rateLimit({
 // Send token immediately after payment
 await sendEmail({
   to: session.customer_details.email,
-  subject: 'Your Mole Cleaner Token',
+  subject: 'Your Sparkle Cleaner Token',
   text: `Your cleanup token: ${token}`
 });
 ```
@@ -174,13 +176,13 @@ const event = stripe.webhooks.constructEvent(
 ### Test Invalid Token
 ```bash
 cd scripts
-./mole.sh mole_fake_token
+./sparkle.sh sparkle_fake_token
 # Should fail with "Invalid token"
 ```
 
 ### Test Without Token
 ```bash
-./mole.sh
+./sparkle.sh
 # Should fail with "Missing cleanup token"
 ```
 
@@ -192,4 +194,4 @@ cd scripts
 
 ---
 
-**Bottom Line:** Users pay $3 → get token via email → token validated on every request → cleanup runs on your server → they can't steal the AI logic! 🦫🔒
+**Bottom Line:** Users pay $3 → get token via email → token validated on every request → cleanup runs on your server → they can't steal the AI logic! ✨🔒

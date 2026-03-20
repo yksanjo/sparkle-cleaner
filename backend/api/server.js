@@ -20,7 +20,7 @@ app.use(cors());
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: '🦫 Mole is ready!' });
+  res.json({ status: '✨ Sparkle is ready!' });
 });
 
 // API routes
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🦫 Mole Cleaner API running on port ${PORT}`);
+  console.log(`✨ Sparkle Cleaner API running on port ${PORT}`);
   console.log(`   Frontend: http://localhost:${PORT}`);
   console.log(`   API: http://localhost:${PORT}/api`);
 });
