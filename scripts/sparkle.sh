@@ -17,7 +17,7 @@ NC='\033[0m'
 
 # ── Config ────────────────────────────────────────────────────────────────────
 API_URL="${SPARKLE_API_URL:-http://localhost:3000}"
-PAYMENT_LINK="${SPARKLE_PAYMENT_LINK:-https://buy.stripe.com/sparkle_placeholder}"
+PAYMENT_LINK="${SPARKLE_PAYMENT_LINK:-https://buy.stripe.com/9B6fZg4arfyb3s10Su43S00}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 print_logo() {
