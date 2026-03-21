@@ -1,26 +1,25 @@
 #!/bin/bash
 
 # ✨ Sparkle Cleaner - AI-Powered Mac Cleanup by Yoshi Kondo
-# Usage: ./sparkle.sh <your-cleanup-token>
-# 
-# SECURITY: This script only collects system info and sends to server
-# All cleanup logic runs on the server, not locally
+# Usage:
+#   ./sparkle.sh          — free scan, shows what's on your Mac
+#   ./sparkle.sh <token>  — runs cleanup (token from email after $1 payment)
 
 set -e
 
-# Colors for output
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# API Configuration
-API_URL="${SPARKLE_API_URL:-http://localhost:3000}"
+# ── Config ────────────────────────────────────────────────────────────────────
+API_URL="${SPARKLE_API_URL:-https://api.sparkle-cleaner.com}"
+PAYMENT_LINK="${SPARKLE_PAYMENT_LINK:-https://buy.stripe.com/sparkle_placeholder}"
 
-# Logo
+# ── Helpers ───────────────────────────────────────────────────────────────────
 print_logo() {
     echo ""
     echo -e "${PURPLE}"
@@ -34,171 +33,143 @@ print_logo() {
     echo ""
 }
 
-# Print step
-print_step() {
-    echo -e "${BLUE}➜ $1${NC}"
-}
+step()    { echo -e "${BLUE}➜  $1${NC}"; }
+success() { echo -e "${GREEN}✓  $1${NC}"; }
+warn()    { echo -e "${YELLOW}⚠  $1${NC}"; }
+err()     { echo -e "${RED}✗  $1${NC}"; }
+hr()      { echo "────────────────────────────────────────────"; }
 
-# Print success
-print_success() {
-    echo -e "${GREEN}✓ $1${NC}"
-}
-
-# Print warning
-print_warning() {
-    echo -e "${YELLOW}⚠ $1${NC}"
-}
-
-# Print error
-print_error() {
-    echo -e "${RED}✗ $1${NC}"
-}
-
-# Check if token is provided
-if [ -z "$1" ]; then
+# ── Free scan (no token) ──────────────────────────────────────────────────────
+run_scan() {
     print_logo
-    print_error "Missing cleanup token!"
+    step "Scanning your Mac — this is read-only, nothing will be changed."
     echo ""
-    echo "Usage: ./sparkle.sh <your-cleanup-token>"
+
+    TOTAL_BYTES=0
+
+    scan_dir() {
+        local label="$1"
+        local path="$2"
+        if [ -d "$path" ]; then
+            local size
+            size=$(du -sh "$path" 2>/dev/null | cut -f1)
+            local bytes
+            bytes=$(du -sk "$path" 2>/dev/null | cut -f1)
+            printf "   %-30s %s\n" "$label" "$size"
+            TOTAL_BYTES=$((TOTAL_BYTES + bytes))
+        fi
+    }
+
+    hr
+    echo "   What Sparkle found on your Mac:"
+    hr
+    scan_dir "Safari browser cache"        "$HOME/Library/Caches/com.apple.Safari"
+    scan_dir "Chrome browser cache"        "$HOME/Library/Application Support/Google/Chrome/Default/Cache"
+    scan_dir "Firefox browser cache"       "$HOME/Library/Caches/Firefox"
+    scan_dir "App caches"                  "$HOME/Library/Caches"
+    scan_dir "System caches"               "/Library/Caches"
+    scan_dir "Log files"                   "$HOME/Library/Logs"
+    scan_dir "Temporary files"             "/private/tmp"
+    scan_dir "Xcode derived data"          "$HOME/Library/Developer/Xcode/DerivedData"
+    hr
     echo ""
-    echo "Get your token after payment at: https://sparkle-cleaner.com"
-    exit 1
-fi
 
-TOKEN=$1
-
-print_logo
-print_step "✨ Sparkle is waking up..."
-echo ""
-
-# Check internet connection
-print_step "Checking internet connection..."
-if ! ping -c 1 8.8.8.8 &> /dev/null; then
-    print_error "No internet connection. Sparkle needs internet to verify your token."
-    exit 1
-fi
-print_success "Connected!"
-
-# Validate token
-print_step "Validating your cleanup token..."
-VALIDATION_RESPONSE=$(curl -s -X POST "$API_URL/api/stripe/validate-token" \
-    -H "Content-Type: application/json" \
-    -d "{\"token\": \"$TOKEN\"}")
-
-VALID=$(echo "$VALIDATION_RESPONSE" | grep -o '"valid":true' || echo "")
-
-if [ -z "$VALID" ]; then
-    print_error "Invalid or expired token!"
-    echo "Response: $VALIDATION_RESPONSE"
+    TOTAL_GB=$(echo "scale=1; $TOTAL_BYTES / 1048576" | bc 2>/dev/null || echo "?")
+    echo -e "   ${GREEN}Total found: ~${TOTAL_GB} GB${NC}"
     echo ""
-    echo "Please check your token or contact support."
-    exit 1
-fi
-
-print_success "Token validated! Let's clean up this Mac! 🎉"
-echo ""
-
-# System info (READ-ONLY - no cleanup happens here)
-print_step "📊 Gathering system information..."
-echo ""
-
-# Disk usage
-print_step "📀 Disk Usage:"
-df -h / | tail -n 1 | awk '{print "   Total: "$2" | Used: "$3" | Available: "$4" | Use: "$5}'
-echo ""
-
-# Check common locations (read-only)
-print_step "🔍 Scanning system (read-only)..."
-echo ""
-
-if [ -d "$HOME/Library/Caches" ]; then
-    CACHE_SIZE=$(du -sh "$HOME/Library/Caches" 2>/dev/null | cut -f1)
-    echo "   User Caches: $CACHE_SIZE"
-fi
-
-if [ -d "/Library/Caches" ]; then
-    SYSTEM_CACHE=$(du -sh "/Library/Caches" 2>/dev/null | cut -f1)
-    echo "   System Caches: $SYSTEM_CACHE"
-fi
-
-if [ -d "$HOME/Library/Logs" ]; then
-    LOG_SIZE=$(du -sh "$HOME/Library/Logs" 2>/dev/null | cut -f1)
-    echo "   User Logs: $LOG_SIZE"
-fi
-
-if [ -d "$HOME/Downloads" ]; then
-    DOWNLOADS_SIZE=$(du -sh "$HOME/Downloads" 2>/dev/null | cut -f1)
-    DOWNLOADS_COUNT=$(ls -1 "$HOME/Downloads" 2>/dev/null | wc -l)
-    echo "   Downloads: $DOWNLOADS_SIZE ($DOWNLOADS_COUNT files)"
-fi
-
-echo ""
-
-# Start cleanup session ON SERVER
-print_step "🚀 Starting AI-powered cleanup on secure server..."
-echo ""
-
-CLEANUP_RESPONSE=$(curl -s -X POST "$API_URL/api/cleanup/start" \
-    -H "Content-Type: application/json" \
-    -d "{\"token\": \"$TOKEN\"}")
-
-echo ""
-print_step "✨ Sparkle's Report:"
-echo ""
-
-# Parse and display the response
-echo "$CLEANUP_RESPONSE" | python3 -c "
-import sys, json
-try:
-    data = json.load(sys.stdin)
-    if 'message' in data:
-        print('   ' + data['message'])
-    if 'phase' in data:
-        print('   Phase: ' + data['phase'])
-    if 'findings' in data:
-        print()
-        print('   Findings:')
-        for f in data['findings']:
-            print(f'     - {f[\"name\"]}: {f[\"size\"]}')
-    if 'aiRecommendation' in data:
-        print()
-        print('   AI Recommendation:')
-        print('     ' + data['aiRecommendation']['summary'])
-        print('     ' + data['aiRecommendation']['recommendation'])
-    if 'cleaned' in data:
-        print()
-        print('   Cleaned:')
-        for c in data['cleaned']:
-            print(f'     ✓ {c}')
-    if 'error' in data:
-        print()
-        print('   Error: ' + data['error'])
-except Exception as e:
-    print('   Raw response:', data)
-" 2>/dev/null || echo "$CLEANUP_RESPONSE"
-
-echo ""
-
-# Mark token as used
-curl -s -X POST "$API_URL/api/stripe/consume-token" \
-    -H "Content-Type: application/json" \
-    -d "{\"token\": \"$TOKEN\"}" > /dev/null
-
-print_success "✨ Sparkle cleanup session complete!"
-echo ""
-echo "   Session ID: $(echo "$CLEANUP_RESPONSE" | grep -o '"sessionId":"[^"]*"' | cut -d'"' -f4)"
-echo ""
-
-if echo "$CLEANUP_RESPONSE" | grep -q '"phase":"complete"'; then
-    print_success "🎉 Your Mac is now sparkling clean!"
+    echo "   None of this has been deleted. Sparkle only looked."
     echo ""
-    echo "   Want to clean again? Purchase another token at:"
-    echo "   https://sparkle-cleaner.com"
+    hr
+    echo ""
+    echo "   To clean this up, pay $1 here — token sent to your email:"
+    echo ""
+    echo -e "   ${PURPLE}${PAYMENT_LINK}${NC}"
+    echo ""
+    echo "   Then run:  ./sparkle.sh <your-token>"
+    echo ""
+    hr
+    echo ""
+    echo "   Questions? Open an issue: https://github.com/yksanjo/sparkle-cleaner"
+    echo ""
+}
+
+# ── Paid cleanup (with token) ─────────────────────────────────────────────────
+run_cleanup() {
+    local TOKEN="$1"
+
+    print_logo
+    step "Validating your token..."
+
+    if ! ping -c 1 8.8.8.8 &> /dev/null; then
+        err "No internet connection."
+        exit 1
+    fi
+
+    VALIDATION=$(curl -s -X POST "$API_URL/api/stripe/validate-token" \
+        -H "Content-Type: application/json" \
+        -d "{\"token\": \"$TOKEN\"}")
+
+    if ! echo "$VALIDATION" | grep -q '"valid":true'; then
+        err "Token is invalid or expired."
+        echo ""
+        echo "   • Tokens expire 24 hours after purchase"
+        echo "   • Each token is single-use"
+        echo "   • Get a new one: ${PAYMENT_LINK}"
+        echo ""
+        exit 1
+    fi
+
+    success "Token valid."
+    echo ""
+    hr
+    step "Starting cleanup — you will approve each action."
+    hr
+    echo ""
+
+    approve_and_delete() {
+        local label="$1"
+        local path="$2"
+        if [ ! -d "$path" ]; then return; fi
+
+        local size
+        size=$(du -sh "$path" 2>/dev/null | cut -f1)
+        echo ""
+        echo -e "   ${YELLOW}Delete ${label} (${size})?${NC}"
+        echo "   Path: $path"
+        printf "   Approve? [y/N] "
+        read -r answer
+        if [[ "$answer" =~ ^[Yy]$ ]]; then
+            rm -rf "$path"
+            success "Deleted ${label} (${size} freed)"
+        else
+            echo "   Skipped."
+        fi
+    }
+
+    approve_and_delete "Safari browser cache"   "$HOME/Library/Caches/com.apple.Safari"
+    approve_and_delete "Chrome browser cache"   "$HOME/Library/Application Support/Google/Chrome/Default/Cache"
+    approve_and_delete "Firefox browser cache"  "$HOME/Library/Caches/Firefox"
+    approve_and_delete "App caches"             "$HOME/Library/Caches"
+    approve_and_delete "System caches"          "/Library/Caches"
+    approve_and_delete "Log files"              "$HOME/Library/Logs"
+    approve_and_delete "Temporary files"        "/private/tmp"
+    approve_and_delete "Xcode derived data"     "$HOME/Library/Developer/Xcode/DerivedData"
+
+    echo ""
+    hr
+
+    # Mark token as used
+    curl -s -X POST "$API_URL/api/stripe/consume-token" \
+        -H "Content-Type: application/json" \
+        -d "{\"token\": \"$TOKEN\"}" > /dev/null
+
+    success "Done. Run the scan again any time to check."
+    echo ""
+}
+
+# ── Entry point ───────────────────────────────────────────────────────────────
+if [ -z "$1" ]; then
+    run_scan
 else
-    print_warning "Check the output above for details"
+    run_cleanup "$1"
 fi
-
-echo ""
-print_step "📝 Want more details? Visit your dashboard:"
-echo "   https://sparkle-cleaner.com/status"
-echo ""
