@@ -1,4 +1,4 @@
-# Sparkle Cleaner
+# Sparkle Cleaner ✨
 
 ## Your Mac has been collecting junk since the day you bought it — and you've never been told.
 
