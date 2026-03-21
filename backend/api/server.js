@@ -13,8 +13,8 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Stripe webhook needs raw body, so we handle it separately
-app.use('/webhook/stripe', express.json({ type: 'application/json' }));
+// Stripe webhook needs raw body for signature verification
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json());
 app.use(cors());
 

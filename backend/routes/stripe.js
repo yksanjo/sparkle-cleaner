@@ -120,8 +120,8 @@ stripeRouter.post('/webhook', async (req, res) => {
       console.log(`✨ Token generated: ${cleanupToken} for session ${session.id}`);
 
       // TODO: Send token via email (use SendGrid, Postmark, etc.)
-      // For now, it's logged - you'll need to set up email delivery
-      console.log(`📧 Email to ${validTokens.get(cleanupToken).customerEmail}: Your token is ${cleanupToken}`);
+      const email = validTokens.get(cleanupToken).customerEmail;
+      console.log(`📧 Token ready for delivery to ${email} (session: ${session.id})`);
       break;
 
     default:
@@ -177,11 +177,14 @@ stripeRouter.post('/consume-token', async (req, res) => {
   res.json({ success: true });
 });
 
-// Admin: List all tokens (for debugging)
+// Admin: List all tokens (requires ADMIN_SECRET env var)
 stripeRouter.get('/tokens', (req, res) => {
-  // In production, add admin authentication here!
+  const secret = process.env.ADMIN_SECRET;
+  if (!secret || req.headers['x-admin-secret'] !== secret) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
   const tokens = Array.from(validTokens.entries()).map(([token, data]) => ({
-    token: token.substring(0, 10) + '...', // Hide full token
+    token: token.substring(0, 10) + '...',
     ...data,
   }));
   res.json({ tokens });
