@@ -1,8 +1,28 @@
 # Sparkle Cleaner
 
-A Mac cache cleaner that runs in your terminal, powered by Claude AI. Scans for free — you only pay $1 to execute the cleanup, which covers the API cost.
+> **The average Mac shows 22 GB of hidden junk on its very first scan — even if you only use it for shopping, email, and browsing.**
+
+Every time you scroll Amazon, browse Etsy, or pin something on Pinterest, your Mac quietly caches every product image, thumbnail, and page asset it loads. A single hour of online shopping adds roughly 100 MB of cached data. Do that a few times a week and within a year you're looking at 47 GB of files your Mac is holding onto for no reason — slowing things down, triggering low storage warnings, and sitting invisible in folders most people never open.
+
+Sparkle scans those folders, shows you exactly what it found, and asks before touching anything.
+
+**Scan is free. $1 to execute — that's the Anthropic API cost, nothing more.**
 
 **Everything this script does is visible in this repo. Read it before running it.**
+
+---
+
+### What's actually building up on your Mac
+
+| What you do | What your Mac stores without telling you |
+|-------------|------------------------------------------|
+| Browse Amazon or Etsy | Every product photo cached locally — 3–10 MB per page |
+| Scroll Pinterest or Instagram | Hundreds of image thumbnails, cached per session |
+| Watch YouTube or Netflix | Video buffer files in temporary storage |
+| Shop on multiple sites in one session | 60–200 MB of new cache per 30-minute session |
+| Use any app at all | App logs, crash reports, and update files that never self-delete |
+
+Safari alone can accumulate up to **16 GB** of browser cache. Most people have never cleared it.
 
 ---
 
