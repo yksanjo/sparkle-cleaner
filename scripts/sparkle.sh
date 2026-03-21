@@ -16,7 +16,7 @@ PURPLE='\033[0;35m'
 NC='\033[0m'
 
 # ── Config ────────────────────────────────────────────────────────────────────
-API_URL="${SPARKLE_API_URL:-https://api.sparkle-cleaner.com}"
+API_URL="${SPARKLE_API_URL:-http://localhost:3000}"
 PAYMENT_LINK="${SPARKLE_PAYMENT_LINK:-https://buy.stripe.com/sparkle_placeholder}"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
