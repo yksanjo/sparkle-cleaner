@@ -1,166 +1,143 @@
 # Sparkle Cleaner
 
-> **The average Mac shows 22 GB of hidden junk on its very first scan — even if you only use it for shopping, email, and browsing.**
+## Your Mac has been collecting junk since the day you bought it — and you've never been told.
 
-Every time you scroll Amazon, browse Etsy, or pin something on Pinterest, your Mac quietly caches every product image, thumbnail, and page asset it loads. A single hour of online shopping adds roughly 100 MB of cached data. Do that a few times a week and within a year you're looking at 47 GB of files your Mac is holding onto for no reason — slowing things down, triggering low storage warnings, and sitting invisible in folders most people never open.
+Every website you visit, every product you browse on Amazon, every photo you scroll past on Pinterest — your Mac quietly saves a copy of all of it. Not to help you. Just because that's what it does by default.
 
-Sparkle scans those folders, shows you exactly what it found, and asks before touching anything.
+After a year of normal use, most people have **over 20 GB of hidden files** they don't know about: website caches, app logs, old update files, tracking data from shopping sites, crash reports from apps you deleted months ago.
 
-**Scan is free. $1 to execute — that's the Anthropic API cost, nothing more.**
+This stuff doesn't show up in your regular storage view. It sits in hidden system folders and slowly eats your disk space and makes your Mac feel sluggish.
 
-**Everything this script does is visible in this repo. Read it before running it.**
-
----
-
-### What's actually building up on your Mac
-
-| What you do | What your Mac stores without telling you |
-|-------------|------------------------------------------|
-| Browse Amazon or Etsy | Every product photo cached locally — 3–10 MB per page |
-| Scroll Pinterest or Instagram | Hundreds of image thumbnails, cached per session |
-| Watch YouTube or Netflix | Video buffer files in temporary storage |
-| Shop on multiple sites in one session | 60–200 MB of new cache per 30-minute session |
-| Use any app at all | App logs, crash reports, and update files that never self-delete |
-
-Safari alone can accumulate up to **16 GB** of browser cache. Most people have never cleared it.
+**Sparkle finds it, shows you exactly what it is, and removes it — with your permission at every step.**
 
 ---
 
-## How it works
+### Sound familiar?
 
-1. Download and run `sparkle.sh` — no payment needed yet
-2. It scans your Mac and shows you exactly what it found
-3. Before deleting anything, it prints each command and asks for your confirmation
-4. If you decide to proceed, pay $1 via Stripe to unlock execution
-5. Cleanup runs with your approval at every step
+- Your Mac says storage is full but you don't know why
+- It runs slower than it used to, even though you haven't installed anything new
+- You get a "Your disk is almost full" warning but can't figure out what to delete
+- You shop online a lot and your browser feels heavy
 
-The $1 charge exists solely to cover the Anthropic API cost (~$0.10/run). I'm not trying to make money from this.
-
----
-
-## What it touches
-
-| Location | What it is |
-|----------|-----------|
-| `~/Library/Caches/*` | App caches |
-| `/Library/Caches/*` | System caches |
-| `~/Library/Logs/*` | Log files |
-| `/tmp/*` | Temporary files |
-| Browser caches | Chrome, Safari, Firefox |
-| Xcode Derived Data | Build artifacts |
-| `__pycache__/` | Python bytecode |
-| `~/Downloads` | Old files — asks you first |
-
-**Never touches:** Documents, Photos, Music, Videos, Desktop, application data.
+That's what this is for.
 
 ---
 
-## Usage
+### What's hiding on your Mac right now
+
+Every time you do this... | Your Mac silently saves...
+--- | ---
+Browse Amazon, Etsy, or ASOS | A copy of every product image you saw — 3 to 10 MB per page
+Scroll Pinterest or Instagram | Hundreds of thumbnail images, saved locally after every session
+Watch YouTube or a streaming site | Video buffer files sitting in temporary storage
+Use any app, even briefly | Log files, crash reports, and update leftovers that never get cleaned up
+Shop online for 30 minutes | Up to 200 MB of new hidden data — every single session
+
+Safari alone can quietly build up to **16 GB** of this data. Most people have never cleared it once.
+
+---
+
+### What Sparkle does
+
+1. **Scans your Mac for free** — no payment, no account, no install
+2. **Shows you a plain-English report** of what it found and how much space it's taking
+3. **Asks for your approval before removing anything** — you see every action before it happens
+4. **Pay $1 only if you want to proceed** — that covers the AI cost, there's no profit here
+
+Nothing gets deleted without you saying yes. You can stop at any point.
+
+---
+
+### How to run it
+
+Open **Terminal** on your Mac (press `Command + Space`, type "Terminal", hit Enter) and paste this:
 
 ```bash
-# Download the script
-curl -O https://raw.githubusercontent.com/yksanjo/sparkle-cleaner/master/scripts/sparkle.sh
-chmod +x sparkle.sh
-
-# Run the free scan
-./sparkle.sh
-
-# If you want to proceed, run with your token
-./sparkle.sh sparkle_your_token_here
+curl -O https://raw.githubusercontent.com/yksanjo/sparkle-cleaner/master/scripts/sparkle.sh && chmod +x sparkle.sh && ./sparkle.sh
 ```
 
-The script will show you output like this before doing anything:
+That's it. It will scan and show you what it found. No payment needed for the scan.
 
-```
-Found 2.1 GB of cache files.
-
-Planned actions:
-  [1] rm -rf ~/Library/Caches/com.google.Chrome
-  [2] rm -rf ~/Library/Caches/com.apple.Safari
-  [3] rm -rf ~/Library/Logs/DiagnosticReports
-
-Approve action [1]? [y/N]
-```
-
-Nothing runs without a `y`.
+**Never used Terminal before?** That's fine. You're just pasting one line. It won't change anything on your Mac until you explicitly say yes.
 
 ---
 
-## Why the terminal?
+### What you'll see
 
-No app install means no persistent process on your machine and nothing that needs updating. The script runs once, does its job, and is gone. You can read every line of it at `scripts/sparkle.sh`.
+```
+Sparkle found 18.4 GB of hidden files on your Mac.
+
+Here's what I found:
+  Safari browser cache .............. 4.2 GB
+  Chrome browser cache .............. 2.8 GB
+  App logs & crash reports .......... 1.1 GB
+  System caches ..................... 6.3 GB
+  Old temporary files ............... 4.0 GB
+
+Want to clean this up? Each action will be shown to you first.
+Pay $1 to proceed → [link]
+```
 
 ---
 
-## Self-hosting
+### What it will never touch
 
-If you'd rather run this yourself without paying anything, the full backend is here.
+- Your photos, videos, music, or documents
+- Your Desktop or Downloads (unless you say yes)
+- Any app you actively use
+- Anything you haven't approved
 
-### Requirements
+---
 
-- Node.js 18+
-- Stripe account (for payment handling)
-- Anthropic API key
+### Why does it cost $1?
 
-### Setup
+This tool uses Claude AI (made by Anthropic) to analyze what's safe to remove. That API call costs roughly $0.10 per scan. The $1 covers that cost and keeps the tool running. There's no subscription, no upsell, and I don't make money from this.
+
+---
+
+### Is this safe? Who made it?
+
+I'm [Yoshi Kondo](https://github.com/yksanjo). I built this because I kept doing the same manual cleanup on my own Mac and wanted something that could do it safely and explain what it was doing.
+
+The entire script is open source — meaning anyone can read exactly what it does before running it. If you're technically inclined, read `scripts/sparkle.sh` line by line. Nothing is hidden.
+
+---
+
+### For developers
+
+Want to self-host this, skip the $1, or run it on your own API key? Full setup instructions below.
+
+<details>
+<summary>Self-hosting setup</summary>
+
+**Requirements:** Node.js 18+, Stripe account, Anthropic API key
 
 ```bash
 git clone https://github.com/yksanjo/sparkle-cleaner.git
 cd sparkle-cleaner
 npm install
 cp .env.example .env
-# Fill in your keys
+# fill in your keys
 npm run dev
 ```
 
-### Environment variables
-
+**Environment variables:**
 ```bash
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ANTHROPIC_API_KEY=sk-ant-...
-ADMIN_SECRET=your_admin_secret_here
+ADMIN_SECRET=your_secret_here
 PORT=3000
 FRONTEND_URL=http://localhost:3000
 ```
 
-### Stripe webhook
-
+**Stripe webhook:**
 1. Stripe Dashboard → Developers → Webhooks
-2. Add endpoint: `https://your-domain.com/api/stripe/webhook`
+2. Endpoint: `https://your-domain.com/api/stripe/webhook`
 3. Event: `checkout.session.completed`
-4. Copy signing secret to `.env`
+
+</details>
 
 ---
 
-## Architecture
-
-```
-sparkle.sh
-  └── free scan (no token needed)
-  └── paid execution (token from Stripe)
-        └── validates token against backend
-        └── calls Claude API to analyze findings
-        └── prints each rm command, waits for y/N
-        └── marks token as used
-```
-
-Backend is Node.js/Express. Token store is file-based (`data/tokens.json`) — good enough for personal use, swap for a database if you scale.
-
----
-
-## Security
-
-- Tokens expire after 24 hours
-- Each token is single-use
-- Stripe webhook signature verified on every request
-- Admin endpoint requires `ADMIN_SECRET` header
-- No user data is stored beyond the cleanup session
-
----
-
-## Built by
-
-[Yoshi Kondo](https://github.com/yksanjo) — I built this because I kept running the same manual cache cleanup commands. Powered by [Anthropic's Claude](https://anthropic.com).
-
-MIT License.
+MIT License · Built by [Yoshi Kondo](https://github.com/yksanjo) · Powered by [Anthropic Claude](https://anthropic.com)
