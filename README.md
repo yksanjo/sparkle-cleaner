@@ -1,5 +1,9 @@
 # Sparkle Cleaner ✨
 
+*Built by [Yoshi Kondo](https://github.com/yksanjo) · Assisted by [Claude Code](https://claude.ai/code)*
+
+---
+
 ## Your Mac has been collecting junk since the day you bought it — and you've never been told.
 
 Every website you visit, every product you browse on Amazon, every photo you scroll past on Pinterest — your Mac quietly saves a copy of all of it. Not to help you. Just because that's what it does by default.
