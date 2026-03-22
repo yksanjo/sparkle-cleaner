@@ -2,6 +2,9 @@ import Stripe from 'stripe';
 import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
 import { Redis } from '@upstash/redis';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const redis = new Redis({
@@ -47,7 +50,26 @@ stripeRouter.post('/webhook', async (req, res) => {
     }, { ex: TOKEN_TTL });
 
     console.log(`✨ Token generated for ${email} (session: ${session.id})`);
-    // TODO: email the token to the user
+
+    if (email) {
+      await resend.emails.send({
+        from: 'Sparkle Cleaner <onboarding@resend.dev>',
+        to: email,
+        subject: '✨ Your Sparkle Cleaner token',
+        html: `
+          <p>Hi,</p>
+          <p>Thanks for purchasing Sparkle Cleaner. Here's your one-time cleanup token:</p>
+          <p style="font-size:18px;font-family:monospace;background:#f4f4f4;padding:12px;border-radius:6px;">
+            ${cleanupToken}
+          </p>
+          <p>Run this in your terminal:</p>
+          <pre style="background:#1a1a1a;color:#fff;padding:12px;border-radius:6px;">./sparkle.sh ${cleanupToken}</pre>
+          <p>Token expires in 24 hours and is single-use.</p>
+          <p>— Yoshi Kondo</p>
+        `,
+      });
+      console.log(`📧 Token emailed to ${email}`);
+    }
   }
 
   res.json({ received: true });
