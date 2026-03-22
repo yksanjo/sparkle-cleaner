@@ -31,7 +31,7 @@ stripeRouter.post('/webhook', async (req, res) => {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
 
-    if (session.payment_status !== 'paid') break;
+    if (session.payment_status !== 'paid') return res.json({ received: true });
 
     const tokenId = session.metadata.token_id || uuidv4();
     const cleanupToken = `sparkle_${tokenId}`;
