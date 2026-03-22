@@ -1,9 +1,13 @@
 import Stripe from 'stripe';
 import { v4 as uuidv4 } from 'uuid';
 import express from 'express';
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 const TOKEN_TTL = 60 * 60 * 24; // 24 hours in seconds
 
 export const stripeRouter = express.Router();
@@ -33,7 +37,7 @@ stripeRouter.post('/webhook', async (req, res) => {
     const cleanupToken = `sparkle_${tokenId}`;
     const email = session.customer_details?.email || null;
 
-    await kv.set(cleanupToken, {
+    await redis.set(cleanupToken, {
       created: Date.now(),
       used: false,
       sessionId: session.id,
@@ -54,7 +58,7 @@ stripeRouter.post('/validate-token', async (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(400).json({ valid: false, error: 'Token required' });
 
-  const data = await kv.get(token);
+  const data = await redis.get(token);
   if (!data)        return res.status(400).json({ valid: false, error: 'Invalid token' });
   if (data.used)    return res.status(400).json({ valid: false, error: 'Token already used' });
   if (data.paymentStatus !== 'paid') return res.status(400).json({ valid: false, error: 'Payment not completed' });
@@ -65,10 +69,10 @@ stripeRouter.post('/validate-token', async (req, res) => {
 // Consume token (mark as used)
 stripeRouter.post('/consume-token', async (req, res) => {
   const { token } = req.body;
-  const data = await kv.get(token);
+  const data = await redis.get(token);
   if (!data) return res.status(400).json({ success: false, error: 'Invalid token' });
 
-  await kv.set(token, { ...data, used: true }, { ex: TOKEN_TTL });
+  await redis.set(token, { ...data, used: true }, { ex: TOKEN_TTL });
   res.json({ success: true });
 });
 
