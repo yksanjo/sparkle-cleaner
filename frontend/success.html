@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Sparkle Cleaner — Your Token</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+    }
+    .sparkle { font-size: 48px; margin-bottom: 16px; }
+    h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+    .sub { color: #888; margin-bottom: 32px; font-size: 15px; }
+    .token-box {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .token-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .token {
+      font-family: monospace;
+      font-size: 15px;
+      color: #a78bfa;
+      word-break: break-all;
+      margin-bottom: 12px;
+    }
+    .copy-btn {
+      background: #a78bfa;
+      color: #000;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #c4b5fd; }
+    .command-box {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .command-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .command {
+      font-family: monospace;
+      font-size: 13px;
+      color: #4ade80;
+      word-break: break-all;
+    }
+    .note { font-size: 13px; color: #555; line-height: 1.6; }
+    .loading { color: #666; font-size: 15px; }
+    .error { color: #f87171; font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="sparkle">✨</div>
+    <h1>Payment confirmed</h1>
+    <p class="sub">Here's your one-time cleanup token.</p>
+
+    <div id="loading" class="loading">Fetching your token...</div>
+
+    <div id="content" style="display:none">
+      <div class="token-box">
+        <div class="token-label">Your token</div>
+        <div class="token" id="token-text"></div>
+        <button class="copy-btn" onclick="copyToken()">Copy token</button>
+      </div>
+
+      <div class="command-box">
+        <div class="command-label">Run this in Terminal</div>
+        <div class="command" id="command-text"></div>
+      </div>
+
+      <p class="note">
+        Token expires in 24 hours and is single-use.<br>
+        Never opened Terminal? Press <strong>Command + Space</strong>, type "Terminal", hit Enter.
+      </p>
+    </div>
+
+    <div id="error" class="error" style="display:none"></div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+
+    async function fetchToken() {
+      if (!sessionId) {
+        showError('No session ID found. Please contact support.');
+        return;
+      }
+      try {
+        const res = await fetch(`/api/stripe/get-token?session_id=${sessionId}`);
+        const data = await res.json();
+        if (!res.ok || !data.token) {
+          showError(data.error || 'Token not ready yet — refresh in a few seconds.');
+          return;
+        }
+        showToken(data.token);
+      } catch (e) {
+        showError('Could not fetch token. Please refresh the page.');
+      }
+    }
+
+    function showToken(token) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      document.getElementById('token-text').textContent = token;
+      document.getElementById('command-text').textContent = `./sparkle.sh ${token}`;
+    }
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      const el = document.getElementById('error');
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+
+    function copyToken() {
+      const token = document.getElementById('token-text').textContent;
+      navigator.clipboard.writeText(token);
+      document.querySelector('.copy-btn').textContent = 'Copied!';
+      setTimeout(() => document.querySelector('.copy-btn').textContent = 'Copy token', 2000);
+    }
+
+    fetchToken();
+  </script>
+</body>
+</html>
