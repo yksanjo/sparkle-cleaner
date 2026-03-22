@@ -121,6 +121,63 @@ run_cleanup() {
 
     success "Token valid."
     echo ""
+
+    # ── Scan ──────────────────────────────────────────────────────────────────
+    hr
+    step "Scanning your Mac..."
+    hr
+    echo ""
+
+    SCAN_JSON="["
+    FIRST=1
+
+    add_finding() {
+        local label="$1"
+        local path="$2"
+        if [ -d "$path" ]; then
+            local size
+            size=$(du -sh "$path" 2>/dev/null | cut -f1)
+            [ $FIRST -eq 0 ] && SCAN_JSON+=","
+            SCAN_JSON+="{\"label\":\"$label\",\"size\":\"$size\"}"
+            FIRST=0
+            printf "   %-30s %s\n" "$label" "$size"
+        fi
+    }
+
+    add_finding "Safari cache"          "$HOME/Library/Caches/com.apple.Safari"
+    add_finding "Chrome cache"          "$HOME/Library/Application Support/Google/Chrome/Default/Cache"
+    add_finding "Firefox cache"         "$HOME/Library/Caches/Firefox"
+    add_finding "App caches"            "$HOME/Library/Caches"
+    add_finding "System caches"         "/Library/Caches"
+    add_finding "Log files"             "$HOME/Library/Logs"
+    add_finding "Temporary files"       "/private/tmp"
+    add_finding "Xcode derived data"    "$HOME/Library/Developer/Xcode/DerivedData"
+
+    SCAN_JSON+="]"
+
+    echo ""
+
+    # ── Claude analysis ───────────────────────────────────────────────────────
+    step "Asking Claude to analyse your results..."
+    echo ""
+
+    ANALYSIS_RESPONSE=$(curl -s -X POST "$API_URL/api/analyze" \
+        -H "Content-Type: application/json" \
+        -d "{\"findings\": $SCAN_JSON, \"token\": \"$TOKEN\"}")
+
+    ANALYSIS=$(echo "$ANALYSIS_RESPONSE" | python3 -c "
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    print(d.get('analysis') or '')
+except: pass
+" 2>/dev/null)
+
+    if [ -n "$ANALYSIS" ]; then
+        echo -e "${PURPLE}   $ANALYSIS${NC}"
+        echo ""
+    fi
+
     hr
     step "Starting cleanup — you will approve each action."
     hr
