@@ -98,6 +98,38 @@ stripeRouter.post('/consume-token', async (req, res) => {
   res.json({ success: true });
 });
 
+// Test email delivery
+stripeRouter.post('/test-email', async (req, res) => {
+  const secret = process.env.ADMIN_SECRET;
+  if (!secret || req.headers['x-admin-secret'] !== secret) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'email required' });
+
+  const testToken = `sparkle_test_${Date.now()}`;
+  await redis.set(testToken, {
+    created: Date.now(), used: false,
+    sessionId: 'test', amountPaid: 100,
+    paymentStatus: 'paid', customerEmail: email,
+  }, { ex: TOKEN_TTL });
+
+  const result = await resend.emails.send({
+    from: 'Sparkle Cleaner <onboarding@resend.dev>',
+    to: email,
+    subject: '✨ Your Sparkle Cleaner token',
+    html: `
+      <p>Hi,</p>
+      <p>Here's your one-time cleanup token:</p>
+      <p style="font-size:18px;font-family:monospace;background:#f4f4f4;padding:12px;border-radius:6px;">${testToken}</p>
+      <pre style="background:#1a1a1a;color:#fff;padding:12px;border-radius:6px;">./sparkle.sh ${testToken}</pre>
+      <p>— Yoshi Kondo</p>
+    `,
+  });
+
+  res.json({ ok: true, token: testToken, resend: result });
+});
+
 // Admin: list tokens
 stripeRouter.get('/tokens', async (req, res) => {
   const secret = process.env.ADMIN_SECRET;
